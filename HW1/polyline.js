@@ -1,8 +1,8 @@
 main(setup());
 
 function setup() {
-    var canvas = document.querySelector("#canvas");
-    var gl = canvas.getContext("webgl");
+    const canvas = document.querySelector("#canvas");
+    const gl = canvas.getContext("webgl");
 
     if(!gl) {
         console.error("[Setup] Unable to initialize WebGL.");
