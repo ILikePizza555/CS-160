@@ -31,6 +31,23 @@ main(setup());
   */
 
 /**
+ * Calculates a Point from a MouseEvent
+ * 
+ * @param {MouseEvent} e
+ * @param {} canvas
+ * @returns {Point}
+ */
+function calculatePoint(e, canvas) {
+    const rect = e.target.getBoundingClientRect();
+
+    // Calculate the x and y
+    const x = ((e.clientX - rect.left) - canvas.height/2)/(canvas.height/2);
+    const y = (canvas.width/2 - (e.clientY - rect.top))/(canvas.width/2);
+
+    return {"x": x, "y": y};
+}
+
+/**
  * Sets up the WebGL program
  * @returns {Setup~Context}
  */
@@ -73,28 +90,38 @@ function setup() {
 
     // Event listener for a click
     canvas.addEventListener("click", function canvasClickHandler(e) {
-        const rect = e.target.getBoundingClientRect();
+        const point = calculatePoint(e, canvas);
+        console.log(point);
 
-        // Calculate the new x and y
-        const x = ((e.clientX - rect.left) - canvas.height/2)/(canvas.height/2);
-        const y = (canvas.width/2 - (e.clientY - rect.top))/(canvas.width/2);
-        console.log("Click: x: " + x + " y: " + y);
-
-        // Add the points to the point array
-        g_points.push({"x": x, "y": y});
-
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        // Add the point to the points array
+        g_points.push(point);
 
         // Convert the points to a vertex buffer
-        const verts = new Float32Array(g_points.map((v, i, a) => [v.x, v.y]).reduce((acc, cv, ci, a) => acc.concat(cv)));
+        const verts = new Float32Array(g_points.map(v => [v.x, v.y]).reduce((acc, cv) => acc.concat(cv)));
         gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
 
+        // Clear the canvas
+        gl.clear(gl.COLOR_BUFFER_BIT);
         // Draw everything as lines and points
         gl.drawArrays(gl.POINTS, 0, g_points.length);
         gl.drawArrays(gl.LINE_STRIP, 0, g_points.length);
     });
 
-    canvas.addEventListener("on")
+    canvas.addEventListener("mousemove", function canvasMoveHandler(e) {
+        if(g_points.length <= 0) {
+            return;
+        }
+
+        const point = calculatePoint(e, canvas);
+
+        const verts = new Float32Array(g_points.concat(point).map(v => [v.x, v.y]).reduce((acc, cv) => acc.concat(cv)));
+        gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+
+
+        // Clear the canvas
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.LINE_STRIP, 0, g_points.length + 1);
+    });
 
     gl.clearColor(0, 0, 0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
