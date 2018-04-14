@@ -92,4 +92,3 @@ function initShaders(gl, vshader, fshader) {
   
     return shader;
   }
-  
