@@ -70,23 +70,31 @@ function setup() {
 
     /** @type {Point[]} */
     var g_points = [];
+
+    // Event listener for a click
     canvas.addEventListener("click", function canvasClickHandler(e) {
         const rect = e.target.getBoundingClientRect();
 
+        // Calculate the new x and y
         const x = ((e.clientX - rect.left) - canvas.height/2)/(canvas.height/2);
         const y = (canvas.width/2 - (e.clientY - rect.top))/(canvas.width/2);
         console.log("Click: x: " + x + " y: " + y);
 
+        // Add the points to the point array
         g_points.push({"x": x, "y": y});
 
         gl.clear(gl.COLOR_BUFFER_BIT);
 
+        // Convert the points to a vertex buffer
         const verts = new Float32Array(g_points.map((v, i, a) => [v.x, v.y]).reduce((acc, cv, ci, a) => acc.concat(cv)));
         gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
 
+        // Draw everything as lines and points
         gl.drawArrays(gl.POINTS, 0, g_points.length);
         gl.drawArrays(gl.LINE_STRIP, 0, g_points.length);
     });
+
+    canvas.addEventListener("on")
 
     gl.clearColor(0, 0, 0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
