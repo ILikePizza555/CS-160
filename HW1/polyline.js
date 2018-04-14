@@ -48,6 +48,16 @@ function calculatePoint(e, canvas) {
 }
 
 /**
+ * 
+ * @param {WebGLRenderingContext} gl 
+ * @param {Point[]} points 
+ */
+function writePointsToVertexBuffer(gl, points) {
+    const verts = new Float32Array(points.map(v => [v.x, v.y]).reduce((acc, cv) => acc.concat(cv)));
+    gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+}
+
+/**
  * Sets up the WebGL program
  * @returns {Setup~Context}
  */
@@ -97,8 +107,7 @@ function setup() {
         g_points.push(point);
 
         // Convert the points to a vertex buffer
-        const verts = new Float32Array(g_points.map(v => [v.x, v.y]).reduce((acc, cv) => acc.concat(cv)));
-        gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
+        writePointsToVertexBuffer(gl, g_points);
 
         // Clear the canvas
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -114,12 +123,12 @@ function setup() {
 
         const point = calculatePoint(e, canvas);
 
-        const verts = new Float32Array(g_points.concat(point).map(v => [v.x, v.y]).reduce((acc, cv) => acc.concat(cv)));
-        gl.bufferData(gl.ARRAY_BUFFER, verts, gl.STATIC_DRAW);
-
+        writePointsToVertexBuffer(gl, g_points.concat(point));
 
         // Clear the canvas
         gl.clear(gl.COLOR_BUFFER_BIT);
+        // To avoid drawing an extra fragment for the rubber banding line, just don't render it!
+        gl.drawArrays(gl.POINTS, 0, g_points.length);
         gl.drawArrays(gl.LINE_STRIP, 0, g_points.length + 1);
     });
 
