@@ -4,6 +4,11 @@
   },
 
   "jshintConfig": {
-    "esversion": 6
+    "esversion": 6,
+    "freeze": true,
+    "predef": ["document", "console"],
+    "strict": "global",
+    "undef": true,
+    "unused": true
   }
 }
