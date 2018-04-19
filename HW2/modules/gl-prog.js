@@ -55,6 +55,8 @@ class GLProgram {
         for(let u of uniforms) {
             this._uniformLocations[u] = this.context.getUniformLocation(this.glProg, u);
         }
+
+        console.log("Successfully created GLProgram");
     }
 
     /**
