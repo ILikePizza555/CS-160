@@ -65,4 +65,18 @@ class GLProgram {
 
         return shader;
     }
+
+    /**
+     * Builds a GLProgram from shaders loaded through the web. The resulting GLProgram is returned as promise.
+     * 
+     * @param {HTMLCanvasElement} canvas 
+     * @param {String} vertexShaderUrl 
+     * @param {String} fragmentShaderUrl 
+     * 
+     * @returns {Promise}
+     */
+    static fromUrls(canvas, vertexShaderUrl, fragmentShaderUrl) {
+        return Promise.all(fetch(vertexShaderUrl), fetch(fragmentShaderUrl))
+                      .then(values => new GLProgram(canvas, values[0], values[1]));
+    }
 }
