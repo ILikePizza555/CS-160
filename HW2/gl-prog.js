@@ -3,11 +3,13 @@
 class GLProgram {
     /**
      * Constructs a GLProgram from the given parameters
-     * @param {String|Element} canvas 
+     * @param {String|HTMLCanvasElement} canvas 
      * @param {String} vertexShader 
      * @param {String} fragmentShader 
+     * @param {String[]} attribs Names of the attributes
+     * @param {String[]} uniforms Names of the uniforms
      */
-    constructor(canvas, vertexShader, fragmentShader) {
+    constructor(canvas, vertexShader, fragmentShader, attribs = [], uniforms = []) {
         /** @type {Element} canvas */
         if(typeof canvas === "string") {
             this.canvas = document.querySelector(canvas);
@@ -38,8 +40,20 @@ class GLProgram {
 
         // Link the program
         this.context.linkProgram(this.glProg);
-        if(!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        if(!this.context.getProgramParameter(this.glProg, this.context.LINK_STATUS)) {
             throw "Failed to link program";
+        }
+
+        // Load the attributes
+        this._attributeLocations = {};
+        for(let a of attribs) {
+            this._attributeLocations[a] = this.context.getAttribLocation(this.glProg, a);
+        }
+
+        // Load the uniforms
+        this._uniformLocations = {};
+        for(let u of uniforms) {
+            this._uniformLocations[u] = this.context.getUniformLocation(this.glProg, u);
         }
     }
 
@@ -69,7 +83,7 @@ class GLProgram {
     /**
      * Builds a GLProgram from shaders loaded through the web. The resulting GLProgram is returned as promise.
      * 
-     * @param {HTMLCanvasElement} canvas 
+     * @param {String|HTMLCanvasElement} canvas 
      * @param {String} vertexShaderUrl 
      * @param {String} fragmentShaderUrl 
      * 
