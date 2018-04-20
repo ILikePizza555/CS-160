@@ -83,6 +83,21 @@ class GLProgram {
     }
 
     /**
+     * Sets the clear color of the canvas
+     * @param {Number[]} color 
+     */
+    setClearColor(...color) {
+        this.context.clearColor(...color);
+    }
+
+    /**
+     * Clears the canvas
+     */
+    clear() {
+        this.context.clear();
+    }
+
+    /**
      * Builds a GLProgram from shaders loaded through the web. The resulting GLProgram is returned as promise.
      * 
      * @param {String|HTMLCanvasElement} canvas 
@@ -91,8 +106,8 @@ class GLProgram {
      * 
      * @returns {Promise}
      */
-    static fromUrls(canvas, vertexShaderUrl, fragmentShaderUrl) {
+    static fromUrls(canvas, vertexShaderUrl, fragmentShaderUrl, ...args) {
         return Promise.all(fetch(vertexShaderUrl), fetch(fragmentShaderUrl))
-                      .then(values => new GLProgram(canvas, values[0], values[1]));
+                      .then(values => new GLProgram(canvas, values[0], values[1], ...args));
     }
 }

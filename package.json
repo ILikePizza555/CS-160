@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "babel": "^6.23.0",
     "jshint": "^2.9.5",
     "typescript": "^2.8.1"
   },
