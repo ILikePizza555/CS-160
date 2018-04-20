@@ -4,8 +4,9 @@
         <title>Polyline</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
-        <link href="https://fonts.googleapis.com/css?family=Fira+Sans" rel="stylesheet">
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8"/>
 
+        <link href="https://fonts.googleapis.com/css?family=Fira+Sans" rel="stylesheet">
         <style>
             html,
             body {
@@ -42,6 +43,8 @@
             </canvas>
         </div>
 
-        <script src="index.js"></script>
+        <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+            <script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
+        <% } %>
     </body>
 </html>

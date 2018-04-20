@@ -1,6 +1,5 @@
 "use strict";
-
-import {GLProgram} from "modules/GLProgram";
+import {GLProgram} from "./modules/GLProgram";
 
 GLProgram.fromUrls("#canvas", "shaders/vert.glsl", "shaders/frag.glsl")
     .then(function(prog) {

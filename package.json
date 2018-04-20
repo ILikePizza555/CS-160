@@ -1,13 +1,14 @@
 {
   "name": "cs_160_homework",
   "version": "I want to die",
-  "dependencies": {
-    "jshint": "^2.9.5",
-    "typescript": "^2.8.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1"
+    "babel-preset-env": "^1.6.1",
+    "jshint": "^2.9.5",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.14",
+    "webpack-serve": "^0.3.1"
   },
   "jshintConfig": {
     "esversion": 6,
@@ -17,11 +18,11 @@
       "console",
       "fetch"
     ],
-    "strict": "global",
     "undef": true,
     "unused": true
   },
   "scripts": {
-    "build-hw2": "babel hw2/src -d hw2/build --copy-files"
+    "build-hw2": "webpack --config ./HW2/webpack.config.js",
+    "serve-hw2": "webpack-serve --config ./HW2/webpack.config.js"
   }
 }
