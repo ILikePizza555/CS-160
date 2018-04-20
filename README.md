@@ -2,13 +2,13 @@
 
 Homework solutions for my Intro to Computer Graphics class (CS 160).
 
-# Build Instructions
+## Build Instructions
 
-## HW 1
+### HW 1
 
 None needed.
 
-## HW 2
+### HW 2
 
 With npm:
 
