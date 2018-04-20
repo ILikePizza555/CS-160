@@ -8,5 +8,8 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "build")
     },
+    devServer: {
+        contentBase: path.resolve(__dirname, "build")
+    },
     plugins: [new HtmlWebpackPlugin()]
 };
