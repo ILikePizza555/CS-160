@@ -1,8 +1,10 @@
 {
   "dependencies": {
-    "babel": "^6.23.0",
     "jshint": "^2.9.5",
     "typescript": "^2.8.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0"
   },
   "jshintConfig": {
     "esversion": 6,
@@ -15,5 +17,8 @@
     "strict": "global",
     "undef": true,
     "unused": true
+  },
+  "scripts": {
+    "build-hw2": "babel hw2 -d HW2/build"
   }
 }
