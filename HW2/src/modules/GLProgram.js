@@ -1,6 +1,27 @@
 "use strict";
 
 /**
+ * Represents a point in 3D space
+ */
+export class Point {
+    /**
+     * 
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {Number} [z=0] 
+     */
+    constructor(x, y, z = 0) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    toArray() {
+        return [this.x, this.y, this.z];
+    }
+}
+
+/**
  * Creates a WebGL context from the HTML5 canvas.
  * 
  * @param {String|HTMLCanvasElement} canvas
@@ -20,14 +41,21 @@ export function createOpenGlContext(canvas) {
 
 export class GLProgram {
     /**
+     * @typedef {Object} VertexBufferConfig
+     * @prop {String} attributeName
+     * @prop {Number} size
+     */
+
+    /**
      * Constructs a GLProgram from the given parameters
      * @param {WebGLRenderingContext} context 
      * @param {String} vertexShader 
      * @param {String} fragmentShader 
      * @param {String[]} attribs Names of the attributes
      * @param {String[]} uniforms Names of the uniforms
+     * @param {VertexBufferConfig} [vertexBuffer] The name of the attribute that will be the vertex buffer
      */
-    constructor(context, vertexShader, fragmentShader, attribs = [], uniforms = []) {
+    constructor(context, vertexShader, fragmentShader, attribs = [], uniforms = [], vertexBuffer) {
         this.context = context;
 
         // Compile the shaders
@@ -63,6 +91,25 @@ export class GLProgram {
             this._uniformLocations[u] = this.context.getUniformLocation(this.glProg, u);
         }
 
+        if(vertexBuffer) {
+            if(typeof vertexBuffer !== "object") {
+                throw new TypeError("Parameter `vertexBuffer` must be an object!");
+            }
+
+            this._vertexBuffer = this.context.createBuffer();
+            if(!this._vertexBuffer) {
+                throw "Failed to create vertex buffer";
+            }
+
+            // Get the attribute index
+            const bufferAttribute = this._attributeLocations[vertexBuffer.attributeName];
+
+            // Configure the attribute to the vertex buffer
+            this.context.bindBuffer(this.context.ARRAY_BUFFER, this._vertexBuffer);
+            this.context.vertexAttribPointer(bufferAttribute, vertexBuffer.size, this.context.FLOAT, false, 0, 0);
+            this.context.enableVertexAttribArray(bufferAttribute);
+        }
+
         console.log("Successfully created GLProgram");
     }
 
@@ -87,6 +134,24 @@ export class GLProgram {
         }
 
         return shader;
+    }
+
+    /**
+     * Writes the points to the vertex buffer. Throws an exception if there is no vertex buffer.
+     * @param {Point[]} points 
+     */
+    writePointsToVertexBuffer(points) {
+        if(!this._vertexBuffer) {
+            throw TypeError("No vertex buffer has been defined.");
+        }
+
+        this.context.bufferData(this.context.ARRAY_BUFFER,
+                                new Float32Array(points.map(p => p.toArray()).reduce((a, c) => a.concat(c))),
+                                this.context.STATIC_DRAW);
+    }
+
+    setProgram() {
+        this.context.useProgram(this.glProg);
     }
 
     /**
