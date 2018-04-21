@@ -1,6 +1,6 @@
 {
   "name": "cs_160_homework",
-  "version": "I want to die",
+  "version": "2",
   "dependencies": {},
   "devDependencies": {
     "babel-cli": "^6.26.0",
