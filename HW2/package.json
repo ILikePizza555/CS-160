@@ -21,7 +21,9 @@
       "fetch"
     ],
     "undef": true,
-    "unused": true
+    "unused": true,
+    "browser": true,
+    "devel": true
   },
   "scripts": {
     "build-hw2": "webpack --config .webpack.config.js",

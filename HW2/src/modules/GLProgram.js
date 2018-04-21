@@ -108,6 +108,11 @@ export class GLProgram {
      */
     static fromUrls(canvas, vertexShaderUrl, fragmentShaderUrl, ...args) {
         return Promise.all(fetch(vertexShaderUrl), fetch(fragmentShaderUrl))
-                      .then(values => new GLProgram(canvas, values[0], values[1], ...args));
+            .then(function([vertexResponse, fragmentResponse]) {
+                return Promise.resolve([vertexResponse.text(), fragmentResponse.text()]);
+            })
+            .then(function([vertexShaderText, fragmentShaderText]) {
+                new GLProgram(canvas, vertexShaderText, fragmentShaderText, ...args);
+            });
     }
 }
