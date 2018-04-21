@@ -1,6 +1,6 @@
 /**
  * @typedef {Object} GLGeometry
- * @prop {Number[]} verticies
+ * @prop {Point[]} verticies
  * @prop {Number[]} indices
  */
 
@@ -47,7 +47,7 @@ export class Triangle {
      */
     numerize(offset = 0) {
         return {
-            verticies: [this.p1, this.p2, this.p3].map(v => v.toArray()).reduce((a, c) => a.concat(c)),
+            verticies: [this.p1, this.p2, this.p3],
             indices: [0, 1, 2].map(v => v + offset)
         };
     }
@@ -100,7 +100,7 @@ export class Quad {
      */
     numerize(offset = 0) {
         return {
-            verticies: [this.p1, this.p2, this.p3, this.p4].map(v => v.toArray()).reduce((a, c) => a.concat(c)),
+            verticies: [this.p1, this.p2, this.p3, this.p4],
             indices: [0, 1, 2, 0, 3, 2].map(v => v + offset)
         };
     }

@@ -148,28 +148,40 @@ export class GLProgram {
 
     /**
      * Writes the points to the vertex buffer. Throws an exception if there is no vertex buffer.
-     * @param {Point[]} points 
+     * @param {Float32Array|Point[]} points 
      */
-    writePointsToVertexBuffer(points) {
+    writeToVertexBuffer(points) {
         if(!this._vertexBuffer) {
             throw TypeError("No vertex buffer has been defined.");
         }
 
-        this.context.bufferData(this.context.ARRAY_BUFFER,
-                                new Float32Array(points.map(p => p.toArray()).reduce((a, c) => a.concat(c))),
-                                this.context.STATIC_DRAW);
+        if(points instanceof Array) {
+            this.context.bufferData(this.context.ARRAY_BUFFER,
+                                    new Float32Array(points.map(p => p.toArray()).reduce((a, c) => a.concat(c))),
+                                    this.context.STATIC_DRAW);
+        } else if (points instanceof Float32Array) {
+            this.context.bufferData(this.context.ARRAY_BUFFER, points, this.context.STATIC_DRAW);
+        } else {
+            throw new TypeError("`points` must an instance of either Float23Array or an Array of `Point`s.");
+        }
     }
 
     /**
      * Writes to the index buffer. Throws an exception if there is no index buffer.
-     * @param {Uint16Array} indices 
+     * @param {Uint16Array|Number[]} indices 
      */
     writeToIndexBuffer(indices) {
         if(!this._indexBuffer) {
-            throw TypeError("No index buffer has been defined");
+            throw new TypeError("No index buffer has been defined");
         }
 
-        this.context.bufferData(this.context.ELEMENT_ARRAY_BUFFER, indices, this.context.STATIC_DRAW);
+        if(indices instanceof Array) {
+            this.context.bufferData(this.context.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), this.context.STATIC_DRAW);
+        } else if(indices instanceof Uint16Array) {
+            this.context.bufferData(this.context.ELEMENT_ARRAY_BUFFER, indices, this.context.STATIC_DRAW);
+        } else {
+            throw new TypeError("`indices` must be an instance of either Uint16Array or an Array of numbers.");
+        }
     }
 
     setProgram() {

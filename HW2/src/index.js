@@ -1,4 +1,5 @@
-import {GLProgram, Point, createOpenGlContext} from "./modules/GLProgram";
+import {GLProgram, createOpenGlContext} from "./modules/GLProgram";
+import {Point, Triangle, Quad} from "./modules/Geometry";
 
 import vertexShader from "./shaders/vert.glsl";
 import fragShader from "./shaders/frag.glsl";
@@ -14,7 +15,7 @@ const glProgramConfig = {
         "size": 3,
         "name": "a_Position"
     },
-    "indexBuffer": true
+    "vbo": true
 };
 
 /**
@@ -23,17 +24,12 @@ const glProgramConfig = {
 function onLoad(prog) {
     "use strict";
     prog.setProgram();
-    prog.writePointsToVertexBuffer([
-        new Point(-0.1, -0.1), //Bottom-left
-        new Point(-0.1, 0.1),  //Top-left
-        new Point(0.1, 0.1),   //Top-right
-        new Point(0.1, -0.1)   //Bottom-right
-    ]);
 
-    prog.writeToIndexBuffer(new Uint16Array([
-        0, 1, 2,
-        0, 3, 2
-    ]));
+    const quad = new Quad({center: new Point(0, 0), width: 0.2, height: 0.2});
+    const n = quad.numerize();
+
+    prog.writePointsToVertexBuffer(n.verticies);
+    prog.writeToIndexBuffer(new Uint16Array(n.indices));
 
     context.clearColor(0.0, 0.0, 0.0, 1.0);
     context.clear(context.COLOR_BUFFER_BIT);
@@ -41,4 +37,9 @@ function onLoad(prog) {
     context.drawElements(context.LINE_STRIP, 6, context.UNSIGNED_SHORT, 0);
 }
 
-GLProgram.fromUrls(context, glProgramConfig).then(onLoad).catch(r => alert(r));
+GLProgram.fromUrls(context, glProgramConfig)
+         .then(onLoad)
+         .catch(function errorHandler(e) {
+                    alert(e);
+                    throw e;
+                });
