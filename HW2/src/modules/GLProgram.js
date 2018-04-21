@@ -52,6 +52,7 @@ export function createOpenGlContext(canvas) {
 * @prop {String[]} [attributes] An array of strings containing the names of attributes this program will use
 * @prop {String[]} [uniforms] An array of strings containing the names of uniforns this program will use
 * @prop {VertexBufferConfig} [vertexBuffer]
+* @prop {Boolean} indexBuffer
 */
 
 /**
@@ -129,6 +130,15 @@ export class GLProgram {
             this.context.enableVertexAttribArray(bufferAttribute);
         }
 
+        if(config.indexBuffer) {
+            this._indexBuffer = this.context.createBuffer();
+            if(!this._indexBuffer) {
+                throw "Failed to create vertex buffer";
+            }
+
+            this.context.bindBuffer(this.context.ELEMENT_ARRAY_BUFFER, this._indexBuffer);
+        }
+
         console.log("Successfully created GLProgram");
     }
 
@@ -167,6 +177,18 @@ export class GLProgram {
         this.context.bufferData(this.context.ARRAY_BUFFER,
                                 new Float32Array(points.map(p => p.toArray()).reduce((a, c) => a.concat(c))),
                                 this.context.STATIC_DRAW);
+    }
+
+    /**
+     * Writes to the index buffer. Throws an exception if there is no index buffer.
+     * @param {Uint16Array} indices 
+     */
+    writeToIndexBuffer(indices) {
+        if(!this._indexBuffer) {
+            throw TypeError("No index buffer has been defined");
+        }
+
+        this.context.bufferData(this.context.ELEMENT_ARRAY_BUFFER, indices, this.context.STATIC_DRAW);
     }
 
     setProgram() {
