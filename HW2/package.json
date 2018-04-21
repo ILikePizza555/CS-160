@@ -26,7 +26,7 @@
     "devel": true
   },
   "scripts": {
-    "build-hw2": "webpack --config .webpack.config.js",
-    "serve-hw2": "webpack-dev-server --config .webpack.config.js --open"
+    "build": "webpack --config ./webpack.config.js",
+    "serve": "webpack-dev-server --config ./webpack.config.js --open"
   }
 }

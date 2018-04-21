@@ -12,9 +12,11 @@ module.exports = {
     devServer: {
         contentBase: path.resolve(__dirname, "build")
     },
-    rules: [{
-        test: /\.glsl$/,
-        use: [{loader: 'file-loader', options: {}}]
-    }],
+    module: {
+        rules: [{
+            test: /\.glsl$/,
+            use: [{loader: 'file-loader', options: {}}]
+        }]
+    },
     plugins: [new HtmlWebpackPlugin({template: path.resolve(__dirname, "src", "template.html")})]
 };
