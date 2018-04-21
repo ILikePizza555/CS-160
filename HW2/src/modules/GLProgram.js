@@ -1,25 +1,6 @@
 "use strict";
 
-/**
- * Represents a point in 3D space
- */
-export class Point {
-    /**
-     * 
-     * @param {Number} x 
-     * @param {Number} y 
-     * @param {Number} [z=0] 
-     */
-    constructor(x, y, z = 0) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    toArray() {
-        return [this.x, this.y, this.z];
-    }
-}
+import {Point, Triangle} from "./Geometry";
 
 /**
  * Creates a WebGL context from the HTML5 canvas.
@@ -130,7 +111,7 @@ export class GLProgram {
             this.context.enableVertexAttribArray(bufferAttribute);
         }
 
-        if(config.indexBuffer) {
+        if(config.vbo) {
             this._indexBuffer = this.context.createBuffer();
             if(!this._indexBuffer) {
                 throw "Failed to create vertex buffer";
