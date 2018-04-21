@@ -67,15 +67,16 @@ export class Quad {
 
     /**
      * Constructs a quad either given a center point, width, and height, or a list of points.
-     * @param {Point[]} points
+     * @param {Point} p1
+     * @param {Point} p2
+     * @param {Point} p3
+     * @param {Point} p4
      */
-    constructor(points) {
-        if(points instanceof Array) {
-            this.p1 = points[0];
-            this.p2 = points[1];
-            this.p2 = points[2];
-            this.p3 = points[3];
-        }
+    constructor(p1, p2, p3, p4) {
+        this.p1 = p1;
+        this.p2 = p2;
+        this.p3 = p3;
+        this.p4 = p4;
     }
 
     /**
