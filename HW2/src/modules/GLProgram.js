@@ -107,12 +107,10 @@ export class GLProgram {
      * @returns {Promise}
      */
     static fromUrls(canvas, vertexShaderUrl, fragmentShaderUrl, ...args) {
-        return Promise.all(fetch(vertexShaderUrl), fetch(fragmentShaderUrl))
-            .then(function([vertexResponse, fragmentResponse]) {
-                return Promise.resolve([vertexResponse.text(), fragmentResponse.text()]);
-            })
-            .then(function([vertexShaderText, fragmentShaderText]) {
-                new GLProgram(canvas, vertexShaderText, fragmentShaderText, ...args);
-            });
+        return Promise.all([fetch(vertexShaderUrl), fetch(fragmentShaderUrl)])
+            .then(([vertexResponse, fragmentResponse]) => Promise.all([vertexResponse.text(), fragmentResponse.text()]))
+            .then(([vertexShaderText, fragmentShaderText]) =>
+                new GLProgram(canvas, vertexShaderText, fragmentShaderText, ...args)
+            );
     }
 }
