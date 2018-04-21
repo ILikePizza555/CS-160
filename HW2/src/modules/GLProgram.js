@@ -1,27 +1,34 @@
 "use strict";
 
+/**
+ * Creates a WebGL context from the HTML5 canvas.
+ * 
+ * @param {String|HTMLCanvasElement} canvas
+ * @return {WebGLRenderingContext}
+ */
+export function createOpenGlContext(canvas) {
+    if(typeof canvas === "string") {
+        canvas = document.querySelector(canvas);
+    }
+
+    const context = canvas.getContext("webgl");
+    if(!context) {
+        throw "Unable to initialize webgl.";
+    }
+    return context;
+}
+
 export class GLProgram {
     /**
      * Constructs a GLProgram from the given parameters
-     * @param {String|HTMLCanvasElement} canvas 
+     * @param {WebGLRenderingContext} context 
      * @param {String} vertexShader 
      * @param {String} fragmentShader 
      * @param {String[]} attribs Names of the attributes
      * @param {String[]} uniforms Names of the uniforms
      */
-    constructor(canvas, vertexShader, fragmentShader, attribs = [], uniforms = []) {
-        /** @type {Element} canvas */
-        if(typeof canvas === "string") {
-            this.canvas = document.querySelector(canvas);
-        } else {
-            this.canvas = canvas;
-        }
-
-        /** @type {WebGLRenderingContext} context */
-        this.context = this.canvas.getContext("webgl");
-        if(!this.context) {
-            throw "Unable to initialize webgl.";
-        }
+    constructor(context, vertexShader, fragmentShader, attribs = [], uniforms = []) {
+        this.context = context;
 
         // Compile the shaders
         this.vertexShader = this._compileShader(this.context.VERTEX_SHADER, vertexShader);
@@ -80,21 +87,6 @@ export class GLProgram {
         }
 
         return shader;
-    }
-
-    /**
-     * Sets the clear color of the canvas
-     * @param {Number[]} color 
-     */
-    setClearColor(...color) {
-        this.context.clearColor(...color);
-    }
-
-    /**
-     * Clears the canvas
-     */
-    clear() {
-        this.context.clear();
     }
 
     /**

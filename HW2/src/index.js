@@ -1,10 +1,13 @@
-import {GLProgram} from "./modules/GLProgram";
+import {GLProgram, createOpenGlContext} from "./modules/GLProgram";
 
 import vertexShader from "./shaders/vert.glsl";
 import fragShader from "./shaders/frag.glsl";
 
-GLProgram.fromUrls("#canvas", vertexShader, fragShader)
+const context = createOpenGlContext("#canvas");
+
+GLProgram.fromUrls(context, vertexShader, fragShader)
     .then(function(prog) {
         "use strict";
-        prog.setClearColor(0.0, 0.0, 0.0, 1.0);
+        context.clearColor(0.0, 0.0, 0.0, 1.0);
+        context.clear(context.COLOR_BUFFER_BIT);
     });
