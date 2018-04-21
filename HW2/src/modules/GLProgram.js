@@ -39,28 +39,39 @@ export function createOpenGlContext(canvas) {
     return context;
 }
 
-export class GLProgram {
-    /**
-     * @typedef {Object} VertexBufferConfig
-     * @prop {String} attributeName
-     * @prop {Number} size
-     */
+/**
+* @typedef {Object} VertexBufferConfig
+* @prop {String} name
+* @prop {Number} size
+*/
 
+/**
+* @typedef {Object} GLProgramConfig
+* @prop {String} vertexShader A string containing the vertex shader this program should use
+* @prop {String} fragmentShader A string containing the fragment shader this program will use
+* @prop {String[]} [attributes] An array of strings containing the names of attributes this program will use
+* @prop {String[]} [uniforms] An array of strings containing the names of uniforns this program will use
+* @prop {VertexBufferConfig} [vertexBuffer]
+*/
+
+/**
+ * @typedef {GLProgramConfig} UrlGLProgramConfig
+ * @prop {String} vertexShaderUrl
+ * @prop {String} fragmentShaderUrl
+ */
+
+export class GLProgram {
     /**
      * Constructs a GLProgram from the given parameters
      * @param {WebGLRenderingContext} context 
-     * @param {String} vertexShader 
-     * @param {String} fragmentShader 
-     * @param {String[]} attribs Names of the attributes
-     * @param {String[]} uniforms Names of the uniforms
-     * @param {VertexBufferConfig} [vertexBuffer] The name of the attribute that will be the vertex buffer
+     * @param {GLProgramConfig} config
      */
-    constructor(context, vertexShader, fragmentShader, attribs = [], uniforms = [], vertexBuffer) {
+    constructor(context, config) {
         this.context = context;
 
         // Compile the shaders
-        this.vertexShader = this._compileShader(this.context.VERTEX_SHADER, vertexShader);
-        this.fragmentShader = this._compileShader(this.context.FRAGMENT_SHADER, fragmentShader);
+        this.vertexShader = this._compileShader(this.context.VERTEX_SHADER, config.vertexShader);
+        this.fragmentShader = this._compileShader(this.context.FRAGMENT_SHADER, config.fragmentShader);
 
         // Create the webgl program (State)
         /** @type {WebGLProgram} glProg */
@@ -79,21 +90,29 @@ export class GLProgram {
             throw "Failed to link program";
         }
 
-        // Load the attributes
-        this._attributeLocations = {};
-        for(let a of attribs) {
-            this._attributeLocations[a] = this.context.getAttribLocation(this.glProg, a);
+        if(config.attributes) {
+            // Load the attributes
+            this._attributeLocations = {};
+            for(let a of config.attributes) {
+                this._attributeLocations[a] = this.context.getAttribLocation(this.glProg, a);
+            }
         }
 
-        // Load the uniforms
-        this._uniformLocations = {};
-        for(let u of uniforms) {
-            this._uniformLocations[u] = this.context.getUniformLocation(this.glProg, u);
+        if(config.uniforms) {
+            // Load the uniforms
+            this._uniformLocations = {};
+            for(let u of config.uniforms) {
+                this._uniformLocations[u] = this.context.getUniformLocation(this.glProg, u);
+            }
         }
 
-        if(vertexBuffer) {
-            if(typeof vertexBuffer !== "object") {
+        if(config.vertexBuffer) {
+            if(typeof config.vertexBuffer !== "object") {
                 throw new TypeError("Parameter `vertexBuffer` must be an object!");
+            }
+
+            if(this._attributeLocations === undefined || this._attributeLocations[config.vertexBuffer.name] === undefined) {
+                throw new TypeError("Attribute for vertex buffer must be defined in `attributes`.");
             }
 
             this._vertexBuffer = this.context.createBuffer();
@@ -102,11 +121,11 @@ export class GLProgram {
             }
 
             // Get the attribute index
-            const bufferAttribute = this._attributeLocations[vertexBuffer.attributeName];
+            const bufferAttribute = this._attributeLocations[config.vertexBuffer.attributeName];
 
             // Configure the attribute to the vertex buffer
             this.context.bindBuffer(this.context.ARRAY_BUFFER, this._vertexBuffer);
-            this.context.vertexAttribPointer(bufferAttribute, vertexBuffer.size, this.context.FLOAT, false, 0, 0);
+            this.context.vertexAttribPointer(bufferAttribute, config.vertexBuffer.size, this.context.FLOAT, false, 0, 0);
             this.context.enableVertexAttribArray(bufferAttribute);
         }
 
@@ -155,19 +174,35 @@ export class GLProgram {
     }
 
     /**
-     * Builds a GLProgram from shaders loaded through the web. The resulting GLProgram is returned as promise.
+     * Builds a GLProgram from shaders loaded through a url. The configuration is exactly the same,
+     * except the values for the shaders are replaced with URLs. The URLs will then resolve and a
+     * promise will be returned.
      * 
-     * @param {String|HTMLCanvasElement} canvas 
-     * @param {String} vertexShaderUrl 
-     * @param {String} fragmentShaderUrl 
+     * @param {WebGLRenderingContext} context
+     * @param {GLProgramConfig} config
      * 
      * @returns {Promise}
      */
-    static fromUrls(canvas, vertexShaderUrl, fragmentShaderUrl, ...args) {
-        return Promise.all([fetch(vertexShaderUrl), fetch(fragmentShaderUrl)])
-            .then(([vertexResponse, fragmentResponse]) => Promise.all([vertexResponse.text(), fragmentResponse.text()]))
-            .then(([vertexShaderText, fragmentShaderText]) =>
-                new GLProgram(canvas, vertexShaderText, fragmentShaderText, ...args)
-            );
+    static fromUrls(context, config) {
+        return Promise.all([fetch(config.vertexShaderUrl), fetch(config.fragmentShaderUrl)])
+            .then(function verifyFetch([vertexResponse, fragmentResponse]) {
+                if(!vertexResponse.ok) {
+                    throw Error("fetch returned " + vertexResponse.status + " for " + config.vertexShaderUrl);
+                }
+
+                if(!fragmentResponse.ok) {
+                    throw Error("fetch returned " + fragmentResponse.status + " for " + config.fragmentShaderUrl);
+                }
+
+                return Promise.all([vertexResponse.text(), fragmentResponse.text()]);
+            })
+            .then(function([vertexShaderText, fragmentShaderText]) {
+                /** @type {GLProgramConfig} config */
+                const newConfig = config;
+                newConfig.vertexShader = vertexShaderText;
+                newConfig.fragmentShader = fragmentShaderText;
+
+                return new GLProgram(context, newConfig);
+            });
     }
 }

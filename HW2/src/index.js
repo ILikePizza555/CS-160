@@ -5,6 +5,16 @@ import fragShader from "./shaders/frag.glsl";
 
 const context = createOpenGlContext("#canvas");
 
+const glProgramConfig = {
+    "vertexShaderUrl": vertexShader,
+    "fragmentShaderUrl": fragShader,
+    "attributes": ["a_Position"],
+    "uniforms": [],
+    "vertexBuffer": {
+        "size": 3,
+        "name": "a_Position"
+    }
+}
 /**
  * @param {GLProgram} prog 
  */
@@ -19,5 +29,4 @@ function onLoad(prog) {
     context.drawArrays(context.POINTS, 0, 3);
 }
 
-GLProgram.fromUrls(context, vertexShader, fragShader, ["a_Position"], [""], {name: "a_Position", size: 3})
-    .then(onLoad);
+GLProgram.fromUrls(context, glProgramConfig).then(onLoad).catch(r => alert(r));
