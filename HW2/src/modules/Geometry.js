@@ -45,7 +45,7 @@ export class Triangle {
      * @param {Number} [offset=0]
      * @returns {GLGeometry}
      */
-    numerize(offset = 0) {
+    toGeometry(offset = 0) {
         return {
             verticies: [this.p1, this.p2, this.p3],
             indices: [0, 1, 2].map(v => v + offset)
@@ -98,7 +98,7 @@ export class Quad {
      * @param {Number} offset
      * @returns {GLGeometry}
      */
-    numerize(offset = 0) {
+    toGeometry(offset = 0) {
         return {
             verticies: [this.p1, this.p2, this.p3, this.p4],
             indices: [0, 1, 2, 0, 3, 2].map(v => v + offset)
