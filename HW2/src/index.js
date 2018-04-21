@@ -26,10 +26,10 @@ function onLoad(prog) {
     prog.setProgram();
 
     const quad = new Quad({center: new Point(0, 0), width: 0.2, height: 0.2});
-    const n = quad.numerize();
+    const n = quad.toGeometry();
 
-    prog.writePointsToVertexBuffer(n.verticies);
-    prog.writeToIndexBuffer(new Uint16Array(n.indices));
+    prog.writeToVertexBuffer(n.verticies);
+    prog.writeToIndexBuffer(n.indices);
 
     context.clearColor(0.0, 0.0, 0.0, 1.0);
     context.clear(context.COLOR_BUFFER_BIT);
