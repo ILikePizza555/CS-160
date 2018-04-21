@@ -25,6 +25,16 @@ export class Point {
     }
 }
 
+/** Normal to XY plane */
+const NORM_XY = new Point(0, 0, 1);
+/** Normal to ZX plane */
+const NORM_ZX = new Point(0, 1, 0);
+/** Normal to ZY plane */
+const NORM_ZY = new Point(1, 0, 0);
+const ZERO = new Point(0, 0 ,0);
+
+export {NORM_XY, NORM_ZX, NORM_ZY, ZERO};
+
 /**
  * Represents a triangle
  */
@@ -54,16 +64,10 @@ export class Triangle {
 }
 
 export class Quad {
-    /**
-     * @typedef {Object} QuadConstructor
-     * @prop {Point} center
-     * @prop {Number} width
-     * @prop {Number} height
-     */
 
     /**
      * Constructs a quad either given a center point, width, and height, or a list of points.
-     * @param {QuadConstructor|Point[]} points
+     * @param {Point[]} points
      */
     constructor(points) {
         if(points instanceof Array) {
@@ -71,18 +75,6 @@ export class Quad {
             this.p2 = points[1];
             this.p2 = points[2];
             this.p3 = points[3];
-            return;
-        }
-
-        if(points instanceof Object) {
-            const center = points.center;
-            const w = points.width / 2;
-            const h = points.height / 2;
-
-            this.p1 = new Point(center.x - w, center.y - h, center.z);
-            this.p2 = new Point(center.x - w, center.y + h, center.z);
-            this.p3 = new Point(center.x + w, center.y + h, center.z);
-            this.p4 = new Point(center.x + w, center.y - h, center.z);
         }
     }
 
@@ -103,5 +95,47 @@ export class Quad {
             verticies: [this.p1, this.p2, this.p3, this.p4],
             indices: [0, 1, 2, 0, 3, 2].map(v => v + offset)
         };
+    }
+
+    /**
+     * Constructs a quad normal to the XY plane with the given properties
+     * @param {Point} center 
+     * @param {Number} width 
+     * @param {Number} height 
+     */
+    static newXYQuad(center, width, height) {
+        const w = width / 2;
+        const h = height / 2;
+
+        return new Quad(new Point(center.x - w, center.y - h, center.z),
+                        new Point(center.x - w, center.y + h, center.z),
+                        new Point(center.x + w, center.y + h, center.z),
+                        new Point(center.x + w, center.y - h, center.z));
+    }
+
+    /**
+     * Constructs a quad normal to the YZ plane with the given properties
+     * @param {Point} center 
+     * @param {Number} width 
+     * @param {Number} height 
+     */
+    static newYZQuad(center, width, height) {
+        const w = width / 2;
+        const h = height / 2;
+
+        return new Quad(new Point(center.x, center.y - h, center.z - w),
+                        new Point(center.x, center.y + h, center.z - w),
+                        new Point(center.x, center.y + h, center.z + w),
+                        new Point(center.x, center.y - h, center.z + w));
+    }
+
+    static newXZQuad(center, width, height) {
+        const w = width / 2;
+        const h = height / 2;
+
+        return new Quad(new Point(center.x - w, center.y, center.z - h),
+                        new Point(center.x - w, center.y, center.z + h),
+                        new Point(center.x + w, center.y, center.z + h),
+                        new Point(center.x + w, center.y, center.z - h));
     }
 }

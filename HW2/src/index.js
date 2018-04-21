@@ -1,5 +1,5 @@
 import {GLProgram, createOpenGlContext} from "./modules/GLProgram";
-import {Point, Triangle, Quad} from "./modules/Geometry";
+import {Point, Triangle, Quad, ZERO} from "./modules/Geometry";
 
 import vertexShader from "./shaders/vert.glsl";
 import fragShader from "./shaders/frag.glsl";
@@ -25,8 +25,19 @@ function onLoad(prog) {
     "use strict";
     prog.setProgram();
 
-    const quad = new Quad({center: new Point(0, 0), width: 0.2, height: 0.2});
-    const n = quad.toGeometry();
+    const cube = [
+        Quad.newXYQuad(ZERO, 0.2, 0.2),
+        Quad.newXZQuad(new Point(0.1, -0.1, 0.1), 0.2, 0.2),
+        Quad.newXZQuad(new Point(0.1, 0.1, 0.1), 0.2, 0.2)
+    ];
+
+    const n = cube.map(v => v.toGeometry()).reduce(function(a, c) {
+        c.indices.map(v => v + a.verticies.length - 1);
+        return {
+            verticies: a.verticies.concat(c.verticies),
+            indices: a.indices.concat(c.indices)
+        };
+    });
 
     prog.writeToVertexBuffer(n.verticies);
     prog.writeToIndexBuffer(n.indices);
