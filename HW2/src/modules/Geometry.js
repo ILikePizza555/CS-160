@@ -54,11 +54,36 @@ export class Triangle {
 }
 
 export class Quad {
-    constructor(p1, p2, p3, p4) {
-        this.p1 = p1;
-        this.p2 = p2;
-        this.p3 = p3;
-        this.p4 = p4;
+    /**
+     * @typedef {Object} QuadConstructor
+     * @prop {Point} center
+     * @prop {Number} width
+     * @prop {Number} height
+     */
+
+    /**
+     * Constructs a quad either given a center point, width, and height, or a list of points.
+     * @param {QuadConstructor|Point[]} points
+     */
+    constructor(points) {
+        if(points instanceof Array) {
+            this.p1 = points[0];
+            this.p2 = points[1];
+            this.p2 = points[2];
+            this.p3 = points[3];
+            return;
+        }
+
+        if(points instanceof Object) {
+            const center = points.center;
+            const w = points.width / 2;
+            const h = points.height / 2;
+
+            this.p1 = new Point(center.x - w, center.y - h, center.z);
+            this.p2 = new Point(center.x - w, center.y + h, center.z);
+            this.p3 = new Point(center.x + w, center.y + h, center.z);
+            this.p4 = new Point(center.x + w, center.y - h, center.z);
+        }
     }
 
     /**
