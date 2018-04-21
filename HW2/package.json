@@ -5,6 +5,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.6.1",
+    "html-webpack-plugin": "^3.2.0",
     "jshint": "^2.9.5",
     "webpack": "^4.6.0",
     "webpack-cli": "^2.0.14",
@@ -22,7 +23,7 @@
     "unused": true
   },
   "scripts": {
-    "build-hw2": "webpack --config ./HW2/webpack.config.js",
-    "serve-hw2": "webpack-dev-server --config ./HW2/webpack.config.js --open"
+    "build-hw2": "webpack --config .webpack.config.js",
+    "serve-hw2": "webpack-dev-server --config .webpack.config.js --open"
   }
 }

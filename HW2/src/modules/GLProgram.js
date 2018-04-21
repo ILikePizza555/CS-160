@@ -1,6 +1,6 @@
 "use strict";
 
-class GLProgram {
+export class GLProgram {
     /**
      * Constructs a GLProgram from the given parameters
      * @param {String|HTMLCanvasElement} canvas 
