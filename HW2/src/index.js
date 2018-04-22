@@ -1,5 +1,5 @@
 import {GLProgram, createOpenGlContext} from "./modules/GLProgram";
-import {Point, Triangle, Quad, ZERO, Circle} from "./modules/Geometry";
+import {Point, Triangle, Quad, ZERO, Circle, Cylinder} from "./modules/Geometry";
 
 import vertexShader from "./shaders/vert.glsl";
 import fragShader from "./shaders/frag.glsl";
@@ -25,8 +25,8 @@ function onLoad(prog) {
     "use strict";
     prog.setProgram();
 
-    const q = new Circle(ZERO, 0.5, 12);
-    const n = q.toGeometry();
+    const c = new Cylinder(0.5, 4);
+    const n = c.toGeometry();
 
     prog.writeToVertexBuffer(n.verticies);
     prog.writeToIndexBuffer(n.indices);

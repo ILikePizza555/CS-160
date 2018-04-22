@@ -66,25 +66,17 @@ export class Triangle {
 export class Quad {
 
     /**
-     * Constructs a quad either given a center point, width, and height, or a list of points.
-     * @param {Point} p1
-     * @param {Point} p2
-     * @param {Point} p3
-     * @param {Point} p4
+     * Constructs a quad either 4 points
+     * @param {Point} bottomLeft
+     * @param {Point} topLeft
+     * @param {Point} bottomRight
+     * @param {Point} topRight
      */
-    constructor(p1, p2, p3, p4) {
-        this.p1 = p1;
-        this.p2 = p2;
-        this.p3 = p3;
-        this.p4 = p4;
-    }
-
-    /**
-     * Returns this quad as an array of triangles
-     * @returns {Triangle[]}
-     */
-    trianglize() {
-        return[new Triangle(this.p1, this.p2, this.p3), new Triangle(this.p1, this.p4, this.p3)];
+    constructor(bottomLeft, topLeft, bottomRight, topRight) {
+        this.bottomLeft = bottomLeft;
+        this.topLeft = topLeft;
+        this.bottomRight = bottomRight;
+        this.topRight = topRight;
     }
 
     /**
@@ -93,51 +85,11 @@ export class Quad {
      */
     toGeometry(offset = 0) {
         return {
-            verticies: [this.p1, this.p2, this.p3, this.p4],
-            indices: [0, 1, 2, 0, 3, 2].map(v => v + offset)
+            verticies: [this.bottomLeft, this.topLeft, this.bottomRight, this.topRight],
+            indices: [0, 2, 3, 0, // Bottom-left triangle
+                      0, 1, 3, 0] // Top-right triangle
+                      .map(v => v + offset)
         };
-    }
-
-    /**
-     * Constructs a quad normal to the XY plane with the given properties
-     * @param {Point} center 
-     * @param {Number} width 
-     * @param {Number} height 
-     */
-    static newXYQuad(center, width, height) {
-        const w = width / 2;
-        const h = height / 2;
-
-        return new Quad(new Point(center.x - w, center.y - h, center.z),
-                        new Point(center.x - w, center.y + h, center.z),
-                        new Point(center.x + w, center.y + h, center.z),
-                        new Point(center.x + w, center.y - h, center.z));
-    }
-
-    /**
-     * Constructs a quad normal to the YZ plane with the given properties
-     * @param {Point} center 
-     * @param {Number} width 
-     * @param {Number} height 
-     */
-    static newYZQuad(center, width, height) {
-        const w = width / 2;
-        const h = height / 2;
-
-        return new Quad(new Point(center.x, center.y - h, center.z - w),
-                        new Point(center.x, center.y + h, center.z - w),
-                        new Point(center.x, center.y + h, center.z + w),
-                        new Point(center.x, center.y - h, center.z + w));
-    }
-
-    static newXZQuad(center, width, height) {
-        const w = width / 2;
-        const h = height / 2;
-
-        return new Quad(new Point(center.x - w, center.y, center.z - h),
-                        new Point(center.x - w, center.y, center.z + h),
-                        new Point(center.x + w, center.y, center.z + h),
-                        new Point(center.x + w, center.y, center.z - h));
     }
 }
 
@@ -163,21 +115,52 @@ export class Circle {
         }
     }
 
-    /**
-     * @returns {Triangle[]}
-     */
-    trianglize() {
-        const triangles = [];
-        for(let i = 2; i < this._verticies.length; i++) {
-            triangles.push(new Triangle(this._verticies[0], this._verticies[i-1], this._verticies[i]));
-        }
-        return triangles;
-    }
 
     toGeometry(offset=0) {
         return {
             verticies: this._verticies,
             indices: [...Array(this._verticies.length).keys()].map(v => v + offset).concat(0)
         };
+    }
+}
+
+export class Cylinder {
+    constructor(radius = 0.1, sides = 12) {
+        this.quads = [];
+
+        const angle = 2 / sides * Math.PI;
+        for(let i = 0; i < sides; i++) {
+            const x1 = Math.cos(i * angle) * radius;
+            const z1 = Math.sin(i * angle) * radius;
+
+            const x2 = Math.cos((i+1) * angle) * radius;
+            const z2 = Math.sin((i+1) * angle) * radius;
+
+            this.quads.push(new Quad(
+                new Point(x1, 0, z1),
+                new Point(x1, -0.2, z1),
+                new Point(x2, -0.2, z2),
+                new Point(x2, 0, z2)
+            ));
+        }
+    }
+
+    toGeometry(offset=0) {
+        const rv = {
+            verticies: [],
+            indices: []
+        };
+
+        for(let i = 1; i < this.quads.length; i += 2) {
+            const q1 = this.quads[i-1];
+            const q2 = this.quads[i];
+
+            // q1 and q2 share an edge, so we filter the duplicate vericies
+            // This is done by selecting the left edge (p1 and p2) of both quads
+            rv.verticies.push(q1.p1, q1.p2, q2.p1, q2.p2);
+            rv.indices.push(...q1.toGeometry(offset + i-1).indices);
+        }
+
+        return rv;
     }
 }
