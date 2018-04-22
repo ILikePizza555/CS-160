@@ -94,7 +94,7 @@ export class Quad {
     toGeometry(offset = 0) {
         return {
             verticies: [this.p1, this.p2, this.p3, this.p4],
-            indices: [0, 1, 2, 3, 0].map(v => v + offset)
+            indices: [0, 1, 2, 0, 3, 2].map(v => v + offset)
         };
     }
 
