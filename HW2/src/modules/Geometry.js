@@ -94,7 +94,7 @@ export class Quad {
     toGeometry(offset = 0) {
         return {
             verticies: [this.p1, this.p2, this.p3, this.p4],
-            indices: [0, 1, 2, 0, 3, 2].map(v => v + offset)
+            indices: [0, 1, 2, 3, 0].map(v => v + offset)
         };
     }
 
@@ -138,5 +138,46 @@ export class Quad {
                         new Point(center.x - w, center.y, center.z + h),
                         new Point(center.x + w, center.y, center.z + h),
                         new Point(center.x + w, center.y, center.z - h));
+    }
+}
+
+export class Circle {
+    /**
+     * 
+     * @param {Point} center The center of the circle
+     * @param {Number} radius The radius of the circle
+     * @param {Number} sides The number of sides of a circle
+     */
+    constructor(center, radius = 0.1, sides = 12) {
+        /** @type {Point} center */
+        this.center = center;
+        /** @type {Point[]} _verticies */
+        this._verticies = [];
+
+        const angle = 2 / sides * Math.PI;
+        for (let i = 0; i <= sides; i++) {
+            const x = Math.cos(i * angle) * radius;
+            const y = Math.sin(i * angle) * radius;
+
+            this._verticies.push(new Point(center.x + x, center.y + y, center.z));
+        }
+    }
+
+    /**
+     * @returns {Triangle[]}
+     */
+    trianglize() {
+        const triangles = [];
+        for(let i = 2; i < this._verticies.length; i++) {
+            triangles.push(new Triangle(this._verticies[0], this._verticies[i-1], this._verticies[i]));
+        }
+        return triangles;
+    }
+
+    toGeometry(offset=0) {
+        return {
+            verticies: this._verticies,
+            indices: [...Array(this._verticies.length).keys()].map(v => v + offset).concat(0)
+        };
     }
 }

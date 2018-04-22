@@ -1,5 +1,5 @@
 import {GLProgram, createOpenGlContext} from "./modules/GLProgram";
-import {Point, Triangle, Quad, ZERO} from "./modules/Geometry";
+import {Point, Triangle, Quad, ZERO, Circle} from "./modules/Geometry";
 
 import vertexShader from "./shaders/vert.glsl";
 import fragShader from "./shaders/frag.glsl";
@@ -25,19 +25,8 @@ function onLoad(prog) {
     "use strict";
     prog.setProgram();
 
-    const cube = [
-        Quad.newXYQuad(ZERO, 0.2, 0.2),
-        Quad.newXZQuad(new Point(0.1, -0.1, 0.1), 0.2, 0.2),
-        Quad.newXZQuad(new Point(0.1, 0.1, 0.1), 0.2, 0.2)
-    ];
-
-    const n = cube.map(v => v.toGeometry()).reduce(function(a, c) {
-        c.indices.map(v => v + a.verticies.length - 1);
-        return {
-            verticies: a.verticies.concat(c.verticies),
-            indices: a.indices.concat(c.indices)
-        };
-    });
+    const q = new Circle(ZERO, 0.5, 12);
+    const n = q.toGeometry();
 
     prog.writeToVertexBuffer(n.verticies);
     prog.writeToIndexBuffer(n.indices);
@@ -45,7 +34,7 @@ function onLoad(prog) {
     context.clearColor(0.0, 0.0, 0.0, 1.0);
     context.clear(context.COLOR_BUFFER_BIT);
 
-    context.drawElements(context.LINE_STRIP, 6, context.UNSIGNED_SHORT, 0);
+    context.drawElements(context.LINE_STRIP, n.verticies.length, context.UNSIGNED_SHORT, 0);
 }
 
 GLProgram.fromUrls(context, glProgramConfig)
