@@ -137,10 +137,10 @@ export class Cylinder {
             const z2 = Math.sin((i+1) * angle) * radius;
 
             this.quads.push(new Quad(
-                new Point(x1, 0, z1),
-                new Point(x1, -0.2, z1),
-                new Point(x2, -0.2, z2),
-                new Point(x2, 0, z2)
+                new Point(x1, -0.2, z1), // Bottom-left
+                new Point(x1, 0, z1),    // Top-left
+                new Point(x2, -0.2, z2), // Bottom-right
+                new Point(x2, 0, z2)     // Top-right
             ));
         }
     }
@@ -156,9 +156,9 @@ export class Cylinder {
             const q2 = this.quads[i];
 
             // q1 and q2 share an edge, so we filter the duplicate vericies
-            // This is done by selecting the left edge (p1 and p2) of both quads
-            rv.verticies.push(q1.p1, q1.p2, q2.p1, q2.p2);
-            rv.indices.push(...q1.toGeometry(offset + i-1).indices);
+            // This is done by selecting the left edge of both quads.
+            rv.verticies.push(q1.bottomLeft, q1.topLeft, q2.bottomLeft, q2.topLeft);
+            rv.indices.push(...[1, 0, 2, 3, 2, 3].map(v => v + Math.floor(i / 2) * 4));
         }
 
         return rv;

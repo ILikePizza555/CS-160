@@ -25,7 +25,7 @@ function onLoad(prog) {
     "use strict";
     prog.setProgram();
 
-    const c = new Cylinder(0.5, 4);
+    const c = new Cylinder(0.5, 12);
     const n = c.toGeometry();
 
     prog.writeToVertexBuffer(n.verticies);
